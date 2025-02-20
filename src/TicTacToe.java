@@ -120,6 +120,8 @@ public class TicTacToe {
             setWinner(board[0][2]);
             setWinner(board[1][1]);
             setWinner(board[2][0]);
+            gameOver = true;
+            return;
         }
 
         if(turns == 9) {
