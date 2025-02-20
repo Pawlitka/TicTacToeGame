@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.util.EventObject;
 import java.util.Objects;
 import javax.swing.*;
 public class TicTacToe {
@@ -62,7 +61,7 @@ public class TicTacToe {
                     public void actionPerformed(ActionEvent e) {
                         if(gameOver) return;
                         JButton tile =  (JButton) e.getSource();
-                        if(tile.getText() == "") {
+                        if(tile.getText().isBlank()) {
                         tile.setText(currentPlayer);
                         turns++;
                         checkWinner();
@@ -79,10 +78,10 @@ public class TicTacToe {
     }
     void checkWinner() {
         for (int row = 0; row < 3; row++) {
-            if(board[row][0].getText() == "") continue;
+            if(board[row][0].getText().isBlank()) continue;
 
-            if(board[row][0].getText() == board[row][1].getText() &&
-                board[row][1].getText() == board[row][2].getText()) {
+            if(board[row][0].getText().equals(board[row][1].getText()) &&
+                board[row][1].getText().equals( board[row][2].getText())) {
                 for (int i = 0; i < 3; i++) {
                     setWinner(board[row][i]);
                 }
@@ -92,10 +91,10 @@ public class TicTacToe {
         }
 
         for(int column = 0; column < 3; column++) {
-            if(board[0][column].getText() == "") continue;
+            if(board[0][column].getText().isBlank()) continue;
 
-            if(board[0][column].getText() == board[1][column].getText() &&
-                    board[1][column].getText() == board[2][column].getText()) {
+            if(board[0][column].getText().equals(board[1][column].getText()) &&
+                    board[1][column].getText().equals(board[2][column].getText())) {
                 for(int i = 0; i < 3; i++) {
                     setWinner(board[i][column]);
                 }
@@ -104,9 +103,9 @@ public class TicTacToe {
             }
         }
 
-        if(board[0][0].getText() == board[1][1].getText() &&
-                board[1][1].getText() == board[2][2].getText() &&
-                board[0][0].getText() != "") {
+        if(board[0][0].getText().equals(board[1][1].getText()) &&
+                board[1][1].getText().equals(board[2][2].getText()) &&
+                !board[0][0].getText().isBlank()) {
             for(int i = 0; i < 3; i++) {
                 setWinner(board[i][i]);
             }
@@ -114,9 +113,9 @@ public class TicTacToe {
             return;
         }
 
-        if(board[0][2].getText() == board[1][1].getText() &&
-            board[1][1].getText() == board[2][0].getText() &&
-            board[0][2].getText() != "") {
+        if(board[0][2].getText().equals(board[1][1].getText()) &&
+            board[1][1].getText().equals(board[2][0].getText()) &&
+            !board[0][2].getText().isBlank()) {
             setWinner(board[0][2]);
             setWinner(board[1][1]);
             setWinner(board[2][0]);
@@ -131,7 +130,6 @@ public class TicTacToe {
                 }
             }
             gameOver = true;
-            return;
         }
     }
 
