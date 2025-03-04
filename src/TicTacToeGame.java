@@ -1,5 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.swing.*;
 
@@ -10,12 +12,15 @@ public class TicTacToeGame {
     private final JPanel boardGamePanel = new JPanel();
     private final TileButton[][] gameBoardButtons = new TileButton[3][3];
     private final String firstPlayer = "X";
-    private  final String secondPlayer = "O";
-    private  String currentPlayer = firstPlayer;
+    private final String secondPlayer = "O";
+    private String currentPlayer = firstPlayer;
     private boolean gameOver = false;
     private int gameTurnsCounter = 0;
 
-    public TicTacToeGame() { }
+    private int winningIndex;
+
+    public TicTacToeGame() {
+    }
 
     public void run() {
         setGameFrame();
@@ -57,6 +62,7 @@ public class TicTacToeGame {
                 boardGamePanel.add(tile);
             }
         }
+        boardGamePanel.updateUI();
     }
 
     private void setHeaderText() {
@@ -80,11 +86,11 @@ public class TicTacToeGame {
 
     private void handleTileButtonClick(ActionEvent e) {
         if (gameOver) return;
-        JButton tile = (JButton) e.getSource();
-        if (tile.getText().isBlank()) {
+        TileButton tile = (TileButton) e.getSource();
+        if (tile.isBlank()) {
             tile.setText(currentPlayer);
             gameTurnsCounter++;
-            checkWinner();
+            checkIfGameIsOver();
             if (!gameOver) {
                 currentPlayer = Objects.equals(currentPlayer, firstPlayer) ? secondPlayer : firstPlayer;
                 headerText.setText(currentPlayer + "'s turn.");
@@ -92,70 +98,154 @@ public class TicTacToeGame {
         }
     }
 
-    void checkWinner() {
+    private Boolean checkIfRowPatternExists() {
         for (int row = 0; row < 3; row++) {
-            if (gameBoardButtons[row][0].getText().isBlank()) continue;
+            TileButton firstTile = gameBoardButtons[row][0];
+            TileButton secondTile = gameBoardButtons[row][1];
+            TileButton thirdTile = gameBoardButtons[row][2];
 
-            if (gameBoardButtons[row][0].getText().equals(gameBoardButtons[row][1].getText()) && gameBoardButtons[row][1].getText().equals(gameBoardButtons[row][2].getText())) {
-                for (int i = 0; i < 3; i++) {
-                    setWinner(gameBoardButtons[row][i]);
-                }
-                gameOver = true;
-                return;
+            boolean hasWinningPattern = !firstTile.isBlank() && firstTile.equals(secondTile) && secondTile.equals(thirdTile);
+            if (hasWinningPattern) {
+                winningIndex = row;
+                return true;
             }
         }
+        return false;
+    }
 
+    private Boolean checkIfColumnPatternExists() {
         for (int column = 0; column < 3; column++) {
-            if (gameBoardButtons[0][column].getText().isBlank()) continue;
+            TileButton firstTile = gameBoardButtons[0][column];
+            TileButton secondTile = gameBoardButtons[1][column];
+            TileButton thirdTile = gameBoardButtons[2][column];
 
-            if (gameBoardButtons[0][column].getText().equals(gameBoardButtons[1][column].getText()) && gameBoardButtons[1][column].getText().equals(gameBoardButtons[2][column].getText())) {
-                for (int i = 0; i < 3; i++) {
-                    setWinner(gameBoardButtons[i][column]);
-                }
+            boolean hasWinningPattern = !firstTile.isBlank() && firstTile.equals(secondTile) && secondTile.equals(thirdTile);
+            if (hasWinningPattern) {
+                winningIndex = column;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Boolean checkIfDiagonalPattern() {
+        TileButton firstTile = gameBoardButtons[0][0];
+        TileButton secondTile = gameBoardButtons[1][1];
+        TileButton thirdTile = gameBoardButtons[2][2];
+        return !firstTile.isBlank() && firstTile.equals(secondTile) && secondTile.equals(thirdTile);
+    }
+
+    private Boolean checkIfAntidiagonalPattern() {
+        TileButton firstTile = gameBoardButtons[0][2];
+        TileButton secondTile = gameBoardButtons[1][1];
+        TileButton thirdTile = gameBoardButtons[2][0];
+        return !firstTile.isBlank() && firstTile.equals(secondTile) && secondTile.equals(thirdTile);
+    }
+
+    private Boolean checkIfTiePatternExists() {
+        return gameTurnsCounter == 9;
+    }
+
+
+    private void checkIfGameIsOver() {
+        ArrayList<Boolean> checkers = new ArrayList<>(
+                List.of(
+                        checkIfRowPatternExists(),
+                        checkIfColumnPatternExists(),
+                        checkIfDiagonalPattern(),
+                        checkIfAntidiagonalPattern(),
+                        checkIfTiePatternExists()
+                )
+        );
+
+
+        for(int i = 0; i < checkers.size(); i++) {
+            Boolean patternExists = checkers.get(i);
+            if(patternExists) {
                 gameOver = true;
-                return;
+                setPattern(i);
+                break;
             }
-        }
-
-        if (gameBoardButtons[0][0].getText().equals(gameBoardButtons[1][1].getText()) &&
-                gameBoardButtons[1][1].getText().equals(gameBoardButtons[2][2].getText()) &&
-                !gameBoardButtons[0][0].getText().isBlank()) {
-            for (int i = 0; i < 3; i++) {
-                setWinner(gameBoardButtons[i][i]);
-            }
-            gameOver = true;
-            return;
-        }
-
-        if (gameBoardButtons[0][2].getText().equals(gameBoardButtons[1][1].getText()) &&
-                gameBoardButtons[1][1].getText().equals(gameBoardButtons[2][0].getText()) &&
-                !gameBoardButtons[0][2].getText().isBlank()) {
-            setWinner(gameBoardButtons[0][2]);
-            setWinner(gameBoardButtons[1][1]);
-            setWinner(gameBoardButtons[2][0]);
-            gameOver = true;
-            return;
-        }
-
-        if (gameTurnsCounter == 9) {
-            for (int row = 0; row < 3; row++) {
-                for (int column = 0; column < 3; column++) {
-                    setTie(gameBoardButtons[row][column]);
-                }
-            }
-            gameOver = true;
         }
     }
 
-    void setWinner(JButton tile) {
-        tile.setForeground(Color.GREEN);
-        tile.setBackground(Color.PINK);
-        headerText.setText(currentPlayer + " is the winner!!");
+    private void setPattern(Integer setterId) {
+        switch (setterId) {
+            case 0:
+                setWinningRowPattern();
+                break;
+            case 1:
+                setWinningColumnPattern();
+                break;
+            case 2:
+                setWinningDiagonalPattern();
+                break;
+            case 3:
+                setWinningAnitdiagonalPattern();
+                break;
+            case 4: // tie pattern id, itd...
+                setTiePattern();
+                break;
+            default:
+                // todo show error or smth lol
+        }
+        boardGamePanel.updateUI();
     }
 
-    void setTie(JButton tile) {
-        tile.setForeground(Color.ORANGE);
-        tile.setBackground(Color.PINK);
+//    private void checkWinner() {
+//        checkIfTieOccurs();
+//        checkIfRowPatternExists();
+//        checkIfColumnPatternExists();
+//        checkIfDiagonalPattern();
+//        checkIfAntidiagonalPattern();
+//
+//        checkIfGameIsOver();
+//    }
+
+    private void setTiePattern() {
+        for (int row = 0; row < 3; row++) {
+            for (int column = 0; column < 3; column++) {
+                gameBoardButtons[row][column].setForeground(Color.ORANGE);
+                gameBoardButtons[row][column].setBackground(Color.PINK);
+            }
+        }
         headerText.setText("Tie!!");
+    }
+
+    private void setWinningRowPattern() {
+        for (int column = 0; column < 3; column++) {
+            setWinningTile(gameBoardButtons[winningIndex][column]);
+        }
+        setWinningHeader();
+    }
+
+    private void setWinningColumnPattern() {
+        for (int row = 0; row < 3; row++) {
+            setWinningTile(gameBoardButtons[row][winningIndex]);
+        }
+        setWinningHeader();
+    }
+
+    private void setWinningDiagonalPattern() {
+        for (int i = 0; i < 3; i++) {
+            setWinningTile(gameBoardButtons[i][i]);
+        }
+        setWinningHeader();
+    }
+
+    private void setWinningAnitdiagonalPattern() {
+        for (int i = 0; i < 3; i++) {
+            int col = gameBoardButtons.length - 1 - i;
+            setWinningTile(gameBoardButtons[i][col]);
+        }
+        setWinningHeader();
+    }
+
+    private void setWinningTile(TileButton tile) {
+        tile.setAsWinning();
+    }
+
+    private void setWinningHeader() {
+        headerText.setText(currentPlayer + " is the winner!!");
     }
 }
