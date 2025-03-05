@@ -137,9 +137,7 @@ public class TicTacToeGame {
             case 2 -> new DiagonalResultSetter(headerText, currentPlayer, gameBoardButtons);
             case 3 -> new AntidiagonalResultSetter(headerText, currentPlayer, gameBoardButtons);
             case 4 -> new TieResultSetter(headerText, gameBoardButtons);
-            default -> throw new IllegalArgumentException("Too much validators!");
-            // todo show error or smth lol - or maybe throw custom exception? and handle it in
-            // a class that is responsible for showing the board players etc.
+            default -> throw new NoResultSetterException("Too much validators!");
         };
         setter.set();
         boardGamePanel.updateUI();
