@@ -1,11 +1,12 @@
 package com.github.Pawlitka.validator;
 
 import com.github.Pawlitka.TileButton;
+import com.github.Pawlitka.setter.ResultSetterName;
 
 public class DiagonalPatternValidator extends PatternValidator {
 
-    public DiagonalPatternValidator(TileButton[][] board) {
-        super(board);
+    public DiagonalPatternValidator(TileButton[][] board, ResultSetterName resultSetterName) {
+        super(board, resultSetterName);
     }
 
     @Override

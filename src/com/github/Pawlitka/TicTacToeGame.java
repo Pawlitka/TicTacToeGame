@@ -107,11 +107,11 @@ public class TicTacToeGame {
     private void checkIfGameIsOver() {
         ArrayList<PatternValidator> validators = new ArrayList<>(
                 List.of(
-                        new RowPatternValidator(gameBoardButtons),
-                        new ColumnPatternValidator(gameBoardButtons),
-                        new DiagonalPatternValidator(gameBoardButtons),
-                        new AntidiagonalPatternValidator(gameBoardButtons),
-                        new TiePatternValidator(gameBoardButtons, gameTurnsCounter)
+                        new RowPatternValidator(gameBoardButtons, ResultSetterName.ROW),
+                        new ColumnPatternValidator(gameBoardButtons, ResultSetterName.COLUMN),
+                        new DiagonalPatternValidator(gameBoardButtons, ResultSetterName.DIAGONAL),
+                        new AntidiagonalPatternValidator(gameBoardButtons, ResultSetterName.ANTIDAGONAL),
+                        new TiePatternValidator(gameBoardButtons, ResultSetterName.TIE, gameTurnsCounter)
                 )
         );
 
@@ -124,20 +124,20 @@ public class TicTacToeGame {
                     winningIndex = ((ColumnPatternValidator) validator).winningIndex;
                 }
                 gameOver = true;
-                setPattern(i);
+                setPattern(validator.getResultSetterName());
                 break;
             }
         }
     }
 
-    private void setPattern(Integer setterId) {
-        ResultSetter setter = switch (setterId) {
-            case 0 -> new RowResultSetter(headerText, currentPlayer, gameBoardButtons, winningIndex);
-            case 1 -> new ColumnResultSetter(headerText, currentPlayer, gameBoardButtons, winningIndex);
-            case 2 -> new DiagonalResultSetter(headerText, currentPlayer, gameBoardButtons);
-            case 3 -> new AntidiagonalResultSetter(headerText, currentPlayer, gameBoardButtons);
-            case 4 -> new TieResultSetter(headerText, gameBoardButtons);
-            default -> throw new NoResultSetterException("Too much validators!");
+    private void setPattern(ResultSetterName setterName) {
+        ResultSetter setter = switch (setterName) {
+            case ROW -> new RowResultSetter(headerText, currentPlayer, gameBoardButtons, winningIndex);
+            case COLUMN -> new ColumnResultSetter(headerText, currentPlayer, gameBoardButtons, winningIndex);
+            case DIAGONAL -> new DiagonalResultSetter(headerText, currentPlayer, gameBoardButtons);
+            case ANTIDAGONAL -> new AntidiagonalResultSetter(headerText, currentPlayer, gameBoardButtons);
+            case TIE -> new TieResultSetter(headerText, gameBoardButtons);
+//            default -> throw new NoResultSetterException("Too much validators!");
         };
         setter.set();
         boardGamePanel.updateUI();

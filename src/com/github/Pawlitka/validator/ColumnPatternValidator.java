@@ -1,12 +1,13 @@
 package com.github.Pawlitka.validator;
 
 import com.github.Pawlitka.TileButton;
+import com.github.Pawlitka.setter.ResultSetterName;
 
 public class ColumnPatternValidator extends PatternValidator {
     public int winningIndex;
 
-    public ColumnPatternValidator(TileButton[][] board) {
-        super(board);
+    public ColumnPatternValidator(TileButton[][] board, ResultSetterName resultSetterName) {
+        super(board, resultSetterName);
     }
 
     @Override
