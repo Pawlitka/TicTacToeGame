@@ -1,3 +1,7 @@
+package com.github.Pawlitka;
+
+import com.github.Pawlitka.validator.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -98,70 +102,21 @@ public class TicTacToeGame {
         }
     }
 
-    private Boolean checkIfRowPatternExists() {
-        for (int row = 0; row < 3; row++) {
-            TileButton firstTile = gameBoardButtons[row][0];
-            TileButton secondTile = gameBoardButtons[row][1];
-            TileButton thirdTile = gameBoardButtons[row][2];
-
-            boolean hasWinningPattern = !firstTile.isBlank() && firstTile.equals(secondTile) && secondTile.equals(thirdTile);
-            if (hasWinningPattern) {
-                winningIndex = row;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private Boolean checkIfColumnPatternExists() {
-        for (int column = 0; column < 3; column++) {
-            TileButton firstTile = gameBoardButtons[0][column];
-            TileButton secondTile = gameBoardButtons[1][column];
-            TileButton thirdTile = gameBoardButtons[2][column];
-
-            boolean hasWinningPattern = !firstTile.isBlank() && firstTile.equals(secondTile) && secondTile.equals(thirdTile);
-            if (hasWinningPattern) {
-                winningIndex = column;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private Boolean checkIfDiagonalPattern() {
-        TileButton firstTile = gameBoardButtons[0][0];
-        TileButton secondTile = gameBoardButtons[1][1];
-        TileButton thirdTile = gameBoardButtons[2][2];
-        return !firstTile.isBlank() && firstTile.equals(secondTile) && secondTile.equals(thirdTile);
-    }
-
-    private Boolean checkIfAntidiagonalPattern() {
-        TileButton firstTile = gameBoardButtons[0][2];
-        TileButton secondTile = gameBoardButtons[1][1];
-        TileButton thirdTile = gameBoardButtons[2][0];
-        return !firstTile.isBlank() && firstTile.equals(secondTile) && secondTile.equals(thirdTile);
-    }
-
-    private Boolean checkIfTiePatternExists() {
-        return gameTurnsCounter == 9;
-    }
-
-
+    // TODO START
     private void checkIfGameIsOver() {
-        ArrayList<Boolean> checkers = new ArrayList<>(
+        ArrayList<PatternValidator> validators = new ArrayList<>(
                 List.of(
-                        checkIfRowPatternExists(),
-                        checkIfColumnPatternExists(),
-                        checkIfDiagonalPattern(),
-                        checkIfAntidiagonalPattern(),
-                        checkIfTiePatternExists()
+                        new RowPatternValidator(gameBoardButtons),
+                        new ColumnPatternValidator(gameBoardButtons),
+                        new DiagonalPatternValidator(gameBoardButtons),
+                        new AntidiagonalPatternValidator(gameBoardButtons),
+                        new TiePatternValidator(gameBoardButtons, gameTurnsCounter)
                 )
         );
 
-
-        for(int i = 0; i < checkers.size(); i++) {
-            Boolean patternExists = checkers.get(i);
-            if(patternExists) {
+        for(int i = 0; i < validators.size(); i++) {
+            PatternValidator validator = validators.get(i);
+            if(validator.validate()) {
                 gameOver = true;
                 setPattern(i);
                 break;
@@ -170,11 +125,14 @@ public class TicTacToeGame {
     }
 
     private void setPattern(Integer setterId) {
+//        WinningSetter setter;
         switch (setterId) {
             case 0:
+//                setter = new RowWinningSetter(board);
                 setWinningRowPattern();
                 break;
             case 1:
+//                setter = new ColumnWinningSetter(board);
                 setWinningColumnPattern();
                 break;
             case 2:
@@ -183,24 +141,16 @@ public class TicTacToeGame {
             case 3:
                 setWinningAnitdiagonalPattern();
                 break;
-            case 4: // tie pattern id, itd...
+            case 4:
                 setTiePattern();
                 break;
             default:
-                // todo show error or smth lol
+                // todo show error or smth lol - or maybe throw custom exception? and handle it in
+                // a class that is responsible for showing the board players etc.
         }
+        // setter.set()
         boardGamePanel.updateUI();
     }
-
-//    private void checkWinner() {
-//        checkIfTieOccurs();
-//        checkIfRowPatternExists();
-//        checkIfColumnPatternExists();
-//        checkIfDiagonalPattern();
-//        checkIfAntidiagonalPattern();
-//
-//        checkIfGameIsOver();
-//    }
 
     private void setTiePattern() {
         for (int row = 0; row < 3; row++) {
@@ -248,4 +198,6 @@ public class TicTacToeGame {
     private void setWinningHeader() {
         headerText.setText(currentPlayer + " is the winner!!");
     }
+
+    // TODO END
 }

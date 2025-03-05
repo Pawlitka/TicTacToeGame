@@ -1,1 +1,1 @@
-# TicTacToeGame
+# com.github.Pawlitka.TicTacToeGame
