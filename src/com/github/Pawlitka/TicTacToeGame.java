@@ -1,5 +1,6 @@
 package com.github.Pawlitka;
 
+import com.github.Pawlitka.setter.*;
 import com.github.Pawlitka.validator.*;
 
 import java.awt.*;
@@ -117,6 +118,11 @@ public class TicTacToeGame {
         for(int i = 0; i < validators.size(); i++) {
             PatternValidator validator = validators.get(i);
             if(validator.validate()) {
+                if(validator instanceof RowPatternValidator) {
+                    winningIndex = ((RowPatternValidator) validator).winningIndex;
+                } else if(validator instanceof ColumnPatternValidator) {
+                    winningIndex = ((ColumnPatternValidator) validator).winningIndex;
+                }
                 gameOver = true;
                 setPattern(i);
                 break;
@@ -125,78 +131,18 @@ public class TicTacToeGame {
     }
 
     private void setPattern(Integer setterId) {
-//        WinningSetter setter;
-        switch (setterId) {
-            case 0:
-//                setter = new RowWinningSetter(board);
-                setWinningRowPattern();
-                break;
-            case 1:
-//                setter = new ColumnWinningSetter(board);
-                setWinningColumnPattern();
-                break;
-            case 2:
-                setWinningDiagonalPattern();
-                break;
-            case 3:
-                setWinningAnitdiagonalPattern();
-                break;
-            case 4:
-                setTiePattern();
-                break;
-            default:
-                // todo show error or smth lol - or maybe throw custom exception? and handle it in
-                // a class that is responsible for showing the board players etc.
-        }
-        // setter.set()
+        ResultSetter setter = switch (setterId) {
+            case 0 -> new RowResultSetter(headerText, currentPlayer, gameBoardButtons, winningIndex);
+            case 1 -> new ColumnResultSetter(headerText, currentPlayer, gameBoardButtons, winningIndex);
+            case 2 -> new DiagonalResultSetter(headerText, currentPlayer, gameBoardButtons);
+            case 3 -> new AntidiagonalResultSetter(headerText, currentPlayer, gameBoardButtons);
+            case 4 -> new TieResultSetter(headerText, gameBoardButtons);
+            default -> throw new IllegalArgumentException("Too much validators!");
+            // todo show error or smth lol - or maybe throw custom exception? and handle it in
+            // a class that is responsible for showing the board players etc.
+        };
+        setter.set();
         boardGamePanel.updateUI();
-    }
-
-    private void setTiePattern() {
-        for (int row = 0; row < 3; row++) {
-            for (int column = 0; column < 3; column++) {
-                gameBoardButtons[row][column].setForeground(Color.ORANGE);
-                gameBoardButtons[row][column].setBackground(Color.PINK);
-            }
-        }
-        headerText.setText("Tie!!");
-    }
-
-    private void setWinningRowPattern() {
-        for (int column = 0; column < 3; column++) {
-            setWinningTile(gameBoardButtons[winningIndex][column]);
-        }
-        setWinningHeader();
-    }
-
-    private void setWinningColumnPattern() {
-        for (int row = 0; row < 3; row++) {
-            setWinningTile(gameBoardButtons[row][winningIndex]);
-        }
-        setWinningHeader();
-    }
-
-    private void setWinningDiagonalPattern() {
-        for (int i = 0; i < 3; i++) {
-            setWinningTile(gameBoardButtons[i][i]);
-        }
-        setWinningHeader();
-    }
-
-    private void setWinningAnitdiagonalPattern() {
-        for (int i = 0; i < 3; i++) {
-            int col = gameBoardButtons.length - 1 - i;
-            setWinningTile(gameBoardButtons[i][col]);
-        }
-        setWinningHeader();
-    }
-
-    private void setWinningTile(TileButton tile) {
-        tile.setAsWinning();
-    }
-
-    private void setWinningHeader() {
-        headerText.setText(currentPlayer + " is the winner!!");
     }
 
     // TODO END
