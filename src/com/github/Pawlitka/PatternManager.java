@@ -3,56 +3,66 @@ package com.github.Pawlitka;
 import com.github.Pawlitka.setter.*;
 import com.github.Pawlitka.validator.*;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PatternManager {
-    private ArrayList<PatternValidator> validators;
+    private final TicTacToeGameState state;
+    private final ArrayList<PatternValidator> validators;
     private int winningIndex;
 
-    public PatternManager() {
+    public PatternManager(TicTacToeGameState state) {
+        this.state = state;
+        this.validators = createValidators(state);
     }
 
-    public Boolean isGameOver(JPanel boardGamePanel, JLabel headerText, String currentPlayer, TileButton[][] board, int turns) {
-        createValidators(board, turns);
+    public void checkIsGameOver() {
+        Boolean isGameOver = isGameOver();
+        state.setGameOver(isGameOver);
+    }
 
+    private Boolean isGameOver() {
         for (PatternValidator validator : validators) {
             if (validator.validate()) {
                 setPossibleWinningIndex(validator);
-                setPattern(boardGamePanel, headerText, currentPlayer, board, validator.getResultSetterName());
+                setPattern(validator.getResultSetterName());
                 return true;
             }
         }
         return false;
     }
 
-    private void createValidators(TileButton[][] board, int turns) {
-        validators = new ArrayList<>(List.of(new RowPatternValidator(board, ResultSetterName.ROW), new ColumnPatternValidator(board, ResultSetterName.COLUMN), new DiagonalPatternValidator(board, ResultSetterName.DIAGONAL), new AntidiagonalPatternValidator(board, ResultSetterName.ANTIDAGONAL), new TiePatternValidator(board, ResultSetterName.TIE, turns)));
-    }
-
-    private void setPossibleWinningIndex(PatternValidator validator) { // todo think about interface for getter WinningIndexGettable chatgpt ask
+    private void setPossibleWinningIndex(PatternValidator validator) {
         if (validator instanceof RowPatternValidator) {
             winningIndex = ((RowPatternValidator) validator).winningIndex;
         } else if (validator instanceof ColumnPatternValidator) {
             winningIndex = ((ColumnPatternValidator) validator).winningIndex;
         }
-//        WinningIndexGettable g = (WinningIndexGettable) validator;
-//        g.getWinningIndex();
     }
 
-    private void setPattern(JPanel boardGamePanel, JLabel headerText, String currentPlayer,
-                            TileButton[][] gameBoardButtons, ResultSetterName setterName) {
+    private void setPattern(ResultSetterName setterName) {
 
         ResultSetter setter = switch (setterName) {
-            case ROW -> new RowResultSetter(headerText, currentPlayer, gameBoardButtons, winningIndex);
-            case COLUMN -> new ColumnResultSetter(headerText, currentPlayer, gameBoardButtons, winningIndex);
-            case DIAGONAL -> new DiagonalResultSetter(headerText, currentPlayer, gameBoardButtons);
-            case ANTIDAGONAL -> new AntidiagonalResultSetter(headerText, currentPlayer, gameBoardButtons);
-            case TIE -> new TieResultSetter(headerText, gameBoardButtons);
+            case ROW -> new RowResultSetter(state, winningIndex);
+            case COLUMN -> new ColumnResultSetter(state, winningIndex);
+            case DIAGONAL -> new DiagonalResultSetter(state);
+            case ANTIDAGONAL -> new AntidiagonalResultSetter(state);
+            case TIE -> new TieResultSetter(state);
             default -> throw new NoResultSetterException("Too much validators!");
         };
         setter.set();
-        boardGamePanel.updateUI();
+        state.boardPanel().updateUI();
+    }
+
+    private ArrayList<PatternValidator> createValidators(TicTacToeGameState state) {
+        return new ArrayList<>(
+                List.of(
+                        new RowPatternValidator(state),
+                        new ColumnPatternValidator(state),
+                        new DiagonalPatternValidator(state),
+                        new AntidiagonalPatternValidator(state),
+                        new TiePatternValidator(state)
+                )
+        );
     }
 }

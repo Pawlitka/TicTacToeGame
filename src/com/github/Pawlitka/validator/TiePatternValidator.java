@@ -1,18 +1,16 @@
 package com.github.Pawlitka.validator;
 
+import com.github.Pawlitka.TicTacToeGameState;
 import com.github.Pawlitka.TileButton;
 import com.github.Pawlitka.setter.ResultSetterName;
 
 public class TiePatternValidator extends PatternValidator {
-    private final int turn;
-
-    public TiePatternValidator(TileButton[][] board, ResultSetterName resultSetterName, int turn) {
-        super(board, resultSetterName);
-        this.turn = turn;
+    public TiePatternValidator(TicTacToeGameState state) {
+        super(state, ResultSetterName.TIE);
     }
 
     @Override
     public Boolean validate() {
-        return turn == 9;
+        return state.turnsCounter() == 9;
     }
 }

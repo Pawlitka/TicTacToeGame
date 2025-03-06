@@ -1,14 +1,15 @@
 package com.github.Pawlitka.validator;
 
+import com.github.Pawlitka.TicTacToeGameState;
 import com.github.Pawlitka.TileButton;
 import com.github.Pawlitka.setter.ResultSetterName;
 
 public abstract class PatternValidator {
-    protected final TileButton[][] board;
+    protected final TicTacToeGameState state;
     protected final ResultSetterName resultSetterName;
 
-    public PatternValidator(TileButton[][] board, ResultSetterName resultSetterName) {
-        this.board = board;
+    public PatternValidator(TicTacToeGameState state, ResultSetterName resultSetterName) {
+        this.state = state;
         this.resultSetterName = resultSetterName;
     }
 

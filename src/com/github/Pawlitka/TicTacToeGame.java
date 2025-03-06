@@ -1,28 +1,13 @@
 package com.github.Pawlitka;
 
-import com.github.Pawlitka.setter.*;
-import com.github.Pawlitka.validator.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class TicTacToeGame {
     private final JFrame gameFrame = new JFrame();
-    private final JLabel headerText = new JLabel();
-    private final JPanel headerPanel = new JPanel();
-    private final JPanel boardGamePanel = new JPanel();
-    private final TileButton[][] gameBoardButtons = new TileButton[3][3];
-    private final String firstPlayer = "X";
-    private final String secondPlayer = "O";
-    private String currentPlayer = firstPlayer;
-    private boolean gameOver = false;
-    private int gameTurnsCounter = 0;
-
-    private int winningIndex;
+    private final TicTacToeGameState state = new TicTacToeGameState(3);
+    private final PatternManager patternManager = new PatternManager(state);
 
     public TicTacToeGame() {
     }
@@ -50,12 +35,12 @@ public class TicTacToeGame {
     private void addHeaderToFrame() {
         setHeaderText();
         setHeaderPanel();
-        gameFrame.add(headerPanel, BorderLayout.NORTH);
+        gameFrame.add(state.headerPanel(), BorderLayout.NORTH);
     }
 
     private void addBoardToFrame() {
-        setBoardGamePanel();
-        gameFrame.add(boardGamePanel);
+        setBoardPanel();
+        gameFrame.add(state.boardPanel());
     }
 
     private void addTileButtonsToBoard() {
@@ -63,50 +48,45 @@ public class TicTacToeGame {
             for (int column = 0; column < 3; column++) {
                 TileButton tile = new TileButton();
                 tile.assignClickListener(this::handleTileButtonClick);
-                gameBoardButtons[row][column] = tile;
-                boardGamePanel.add(tile);
+                state.board()[row][column] = tile;
+                state.boardPanel().add(tile);
             }
         }
-        boardGamePanel.updateUI();
+        state.boardPanel().updateUI();
     }
 
     private void setHeaderText() {
-        this.headerText.setBackground(Color.PINK);
-        this.headerText.setForeground(Color.BLACK);
-        this.headerText.setFont(new Font("Arial", Font.BOLD, 50));
-        this.headerText.setHorizontalAlignment(JLabel.CENTER);
-        this.headerText.setText("Tic-Tac-Toe");
-        this.headerText.setOpaque(true);
+        JLabel headerText = state.headerText();
+        headerText.setBackground(Color.PINK);
+        headerText.setForeground(Color.BLACK);
+        headerText.setFont(new Font("Arial", Font.BOLD, 50));
+        headerText.setHorizontalAlignment(JLabel.CENTER);
+        headerText.setText("Tic-Tac-Toe");
+        headerText.setOpaque(true);
     }
 
     private void setHeaderPanel() {
+        JPanel headerPanel = state.headerPanel();
         headerPanel.setLayout(new BorderLayout());
-        headerPanel.add(headerText);
+        headerPanel.add(state.headerText());
     }
 
-    private void setBoardGamePanel() {
-        boardGamePanel.setLayout(new GridLayout(3, 3));
-        boardGamePanel.setBackground(Color.PINK);
+    private void setBoardPanel() {
+        JPanel boardPanel = state.boardPanel();
+        boardPanel.setLayout(new GridLayout(3, 3));
+        boardPanel.setBackground(Color.PINK);
     }
 
     private void handleTileButtonClick(ActionEvent e) {
-        if (gameOver) return;
+        if (state.gameOver()) return;
         TileButton tile = (TileButton) e.getSource();
         if (tile.isBlank()) {
-            tile.setText(currentPlayer);
-            gameTurnsCounter++;
-            checkIfGameIsOver();
-            if (!gameOver) {
-                currentPlayer = Objects.equals(currentPlayer, firstPlayer) ? secondPlayer : firstPlayer;
-                headerText.setText(currentPlayer + "'s turn.");
+            tile.setText(state.currentPlayer());
+            state.incrementTurnsCounter();
+            patternManager.checkIsGameOver();
+            if (!state.gameOver()) {
+                state.updateForNextTurn();
             }
         }
     }
-
-    // TODO START
-    private void checkIfGameIsOver() {
-        PatternManager patternManager = new PatternManager();
-        gameOver = patternManager.isGameOver(boardGamePanel, headerText, currentPlayer, gameBoardButtons, gameTurnsCounter);
-    }
-    // TODO END
 }

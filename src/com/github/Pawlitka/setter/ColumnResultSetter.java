@@ -1,5 +1,6 @@
 package com.github.Pawlitka.setter;
 
+import com.github.Pawlitka.TicTacToeGameState;
 import com.github.Pawlitka.TileButton;
 
 import javax.swing.*;
@@ -7,8 +8,8 @@ import javax.swing.*;
 public class ColumnResultSetter extends ResultSetter {
     public int winningIndex;
 
-    public ColumnResultSetter(JLabel headerText, String currentPlayer, TileButton[][] board, int winningIndex) {
-        super(headerText, currentPlayer, board);
+    public ColumnResultSetter(TicTacToeGameState state, int winningIndex) {
+        super(state);
         this.winningIndex = winningIndex;
     }
 
@@ -16,7 +17,7 @@ public class ColumnResultSetter extends ResultSetter {
     public void set() {
         super.set();
         for (int row = 0; row < 3; row++) {
-            setWinningTile(board[row][winningIndex]);
+            setWinningTile(state.board()[row][winningIndex]);
         }
     }
 }

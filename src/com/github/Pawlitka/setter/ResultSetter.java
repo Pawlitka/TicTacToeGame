@@ -1,18 +1,15 @@
 package com.github.Pawlitka.setter;
 
+import com.github.Pawlitka.TicTacToeGameState;
 import com.github.Pawlitka.TileButton;
 
 import javax.swing.*;
 
 public abstract class ResultSetter {
-    protected final JLabel headerText;
-    protected final String currentPlayer;
-    protected final TileButton[][] board;
+    protected final TicTacToeGameState state;
 
-    public ResultSetter(JLabel headerText, String currentPlayer, TileButton[][] board) {
-        this.headerText = headerText;
-        this.currentPlayer = currentPlayer;
-        this.board = board;
+    public ResultSetter(TicTacToeGameState state) {
+        this.state = state;
     }
 
     public void set() {
@@ -24,7 +21,7 @@ public abstract class ResultSetter {
     }
 
     protected void setWinningHeader() {
-        headerText.setText(currentPlayer + " is the winner!!");
+        state.headerText().setText(state.currentPlayer() + " is the winner!!");
     }
 }
 
